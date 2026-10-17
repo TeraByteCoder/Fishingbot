@@ -1,0 +1,16 @@
+[Unit]
+Description=Headless Minecraft fishing bot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/absolute/path/to/Fishingbot
+ExecStart=/usr/bin/node --env-file-if-exists=.env src/index.js
+Restart=no
+TimeoutStopSec=10
+UMask=0077
+NoNewPrivileges=true
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,18 @@
+{
+  "minecraft": { "host": "", "port": 25565, "version": "1.21.4" },
+  "fishing": {
+    "autoStart": true,
+    "yaw": null,
+    "pitch": null,
+    "castTimeoutMs": 120000,
+    "retryDelayMs": 3000,
+    "catchWindowMs": 2500,
+    "catchRadius": 6
+  },
+  "autoEat": {
+    "minHunger": 15,
+    "bannedFood": ["rotten_flesh", "pufferfish", "chorus_fruit", "poisonous_potato", "spider_eye", "suspicious_stew"]
+  },
+  "reconnect": { "initialDelayMs": 5000, "maxDelayMs": 120000 },
+  "storage": { "stateFile": "data/state.json", "authDirectory": "auth-cache" }
+}

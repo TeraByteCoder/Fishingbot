@@ -1,0 +1,19 @@
+{
+  "name": "headless-minecraft-fishingbot",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Headless Minecraft Java 1.21.4 fishing bot with Telegram control and persistent damage protection",
+  "engines": { "node": ">=22.9.0" },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env src/index.js",
+    "test": "node --test",
+    "check": "node scripts/check.js",
+    "smoke": "node scripts/smoke.js"
+  },
+  "dependencies": {
+    "mineflayer": "4.39.0",
+    "mineflayer-auto-eat": "5.0.3",
+    "telegraf": "4.16.3"
+  }
+}
