@@ -15,5 +15,8 @@
     "mineflayer": "4.39.0",
     "mineflayer-auto-eat": "5.0.3",
     "telegraf": "4.16.3"
+  },
+  "overrides": {
+    "uuid": "11.1.1"
   }
 }
