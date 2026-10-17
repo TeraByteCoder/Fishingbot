@@ -121,6 +121,8 @@ The service intentionally does not restart automatically after an unexpected pro
 
 ## Android / Termux
 
+For a standalone native app with settings, statistics, fishing controls and a foreground notification, see [Fishing Bot for Android](android/README.md). The app runs the bot directly on the phone and can reuse a provisioned Microsoft authentication cache. Termux is an alternative, not required by the native app.
+
 Install a current Termux build from its official distribution, then:
 
 ```bash

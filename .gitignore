@@ -8,3 +8,13 @@ auth-cache/
 *.log
 coverage/
 .npm-cache/
+android/.gradle/
+android/local.properties
+android/**/build/
+android/app/src/main/assets/bot.zip
+android/app/src/main/assets/bot-version.txt
+android/app/src/main/assets/runtime-notices/
+android/app/src/main/jniLibs/
+android/.runtime-cache/
+android/local-device/
+*.apk

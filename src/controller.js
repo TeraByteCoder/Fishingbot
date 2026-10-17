@@ -3,8 +3,8 @@ import { CatchTracker } from './catches.js';
 import { Resources } from './resources.js';
 
 export class Controller {
-  constructor({ config, store, createBot, autoEatPlugin, notify = () => {}, logger = console, resources = new Resources() }) {
-    Object.assign(this, { config, store, createBot, autoEatPlugin, notify, logger, resources });
+  constructor({ config, store, createBot, autoEatPlugin, notify = () => {}, logger = console, resources = new Resources(), onAuthCode = () => {} }) {
+    Object.assign(this, { config, store, createBot, autoEatPlugin, notify, logger, resources, onAuthCode });
     this.startedAt = Date.now();
     this.wanted = config.fishing.autoStart;
     this.connected = false;
@@ -49,6 +49,7 @@ export class Controller {
         auth: 'microsoft', profilesFolder: this.config.storage.authDirectory,
         respawn: false, hideErrors: true,
         onMsaCode: data => {
+          this.onAuthCode({ url: data.verification_uri || 'https://www.microsoft.com/link', code: data.user_code });
           // Device codes are credentials: display locally, never send to Telegram.
           this.logger.log(`Microsoft login: open ${data.verification_uri || 'https://www.microsoft.com/link'} and enter ${data.user_code}`);
           this.alert('Microsoft sign-in required. Check the local terminal for the device code.', 'auth');

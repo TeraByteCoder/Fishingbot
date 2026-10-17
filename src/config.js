@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-export function loadConfig(env = process.env, root = process.cwd()) {
+export function loadConfig(env = process.env, root = process.cwd(), { telegramOptional = false } = {}) {
   const defaults = JSON.parse(readFileSync(new URL('../config.example.json', import.meta.url), 'utf8'));
   let custom = {};
   try {
@@ -42,7 +42,9 @@ export function loadConfig(env = process.env, root = process.cwd()) {
     config.storage[key] = resolve(root, config.storage[key]);
   }
   if (!env.MC_USERNAME?.trim()) throw new Error('Set MC_USERNAME in .env.');
-  if (!env.TELEGRAM_BOT_TOKEN || env.TELEGRAM_BOT_TOKEN.startsWith('replace-')) throw new Error('Set TELEGRAM_BOT_TOKEN in .env.');
-  if (!/^[1-9]\d*$/.test(env.TELEGRAM_OWNER_ID || '')) throw new Error('Set TELEGRAM_OWNER_ID to your private Telegram user ID.');
+  if (!telegramOptional || env.TELEGRAM_BOT_TOKEN || env.TELEGRAM_OWNER_ID) {
+    if (!env.TELEGRAM_BOT_TOKEN || env.TELEGRAM_BOT_TOKEN.startsWith('replace-')) throw new Error('Set TELEGRAM_BOT_TOKEN in .env.');
+    if (!/^[1-9]\d*$/.test(env.TELEGRAM_OWNER_ID || '')) throw new Error('Set TELEGRAM_OWNER_ID to your private Telegram user ID.');
+  }
   return { ...config, username: env.MC_USERNAME.trim(), telegramToken: env.TELEGRAM_BOT_TOKEN, ownerId: env.TELEGRAM_OWNER_ID };
 }
