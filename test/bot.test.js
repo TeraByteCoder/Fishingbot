@@ -278,3 +278,14 @@ test('server address and both fishing angles must be explicitly configured', t =
   rmSync(path);
   assert.throws(() => loadConfig(env, f.root), /minecraft.host/);
 });
+
+test('stats includes process resources alongside persistent fishing statistics', t => {
+  const { controller } = fixture(t);
+  const report = controller.stats();
+  assert.match(report, /RAM \(RSS\):/);
+  assert.match(report, /CPU \(5-second sample/);
+  assert.match(report, /Tracked network \(Minecraft \+ Telegram\)/);
+  assert.match(report, /Downloaded:/);
+  assert.match(report, /Uploaded:/);
+  assert.match(report, /Lifetime statistics\nCasts: 0/);
+});

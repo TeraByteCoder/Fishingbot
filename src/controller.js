@@ -1,9 +1,10 @@
 import { fishOnce, minecraftAngles } from './fishing.js';
 import { CatchTracker } from './catches.js';
+import { Resources } from './resources.js';
 
 export class Controller {
-  constructor({ config, store, createBot, autoEatPlugin, notify = () => {}, logger = console }) {
-    Object.assign(this, { config, store, createBot, autoEatPlugin, notify, logger });
+  constructor({ config, store, createBot, autoEatPlugin, notify = () => {}, logger = console, resources = new Resources() }) {
+    Object.assign(this, { config, store, createBot, autoEatPlugin, notify, logger, resources });
     this.startedAt = Date.now();
     this.wanted = config.fishing.autoStart;
     this.connected = false;
@@ -22,6 +23,7 @@ export class Controller {
   }
 
   start() {
+    this.resources.start();
     this.flushTimer = setInterval(() => this.persist(), 10000);
     if (this.store.state.damageLock) this.alert('Damage protection is locked. Inspect the fishing spot, then use /reconnect to unlock.');
     else this.connect();
@@ -58,6 +60,7 @@ export class Controller {
       return;
     }
     this.bot = bot;
+    this.resources.trackMinecraft(bot._client);
     const session = { bot, ready: false, busy: false, health: null, abort: null, tracker: null, closed: false };
     this.session = session;
     const current = () => this.session === session && !session.closed && !this.stopped && !this.store.state.damageLock;
@@ -226,7 +229,7 @@ export class Controller {
   stats() {
     const s = this.store.state.stats;
     const items = map => Object.entries(map).sort((a, b) => b[1] - a[1]).map(([name, n]) => `${name}: ${n}`).join('\n') || 'None';
-    return `Lifetime statistics\nCasts: ${s.casts}\nCompleted catches: ${s.catches}\nFishing/food errors: ${s.fishingErrors}\nMeals: ${s.meals}\nDisconnects: ${s.disconnects}\nDamage events: ${s.damageEvents}\n\nNearby catch-window observations (heuristic):\n${items(s.observedItems)}\n\nItems picked up by the bot (all sources):\n${items(s.collectedItems)}\n\nThese item lists overlap. Hopper contents and exact catch ownership are not visible.`;
+    return `${this.resources.report()}\n\nLifetime statistics\nCasts: ${s.casts}\nCompleted catches: ${s.catches}\nFishing/food errors: ${s.fishingErrors}\nMeals: ${s.meals}\nDisconnects: ${s.disconnects}\nDamage events: ${s.damageEvents}\n\nNearby catch-window observations (heuristic):\n${items(s.observedItems)}\n\nItems picked up by the bot (all sources):\n${items(s.collectedItems)}\n\nThese item lists overlap. Hopper contents and exact catch ownership are not visible.`;
   }
 
   inventory() {
@@ -236,6 +239,7 @@ export class Controller {
 
   shutdown() {
     this.stopped = true;
+    this.resources.stop();
     clearInterval(this.flushTimer);
     clearTimeout(this.reconnectTimer);
     clearInterval(this.session?.timer);

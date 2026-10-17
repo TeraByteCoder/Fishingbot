@@ -50,7 +50,7 @@ Before running unattended, position the account at the fishing spot using a norm
 | Command | Behavior |
 | --- | --- |
 | `/status` | Connection, damage lock, fishing state, HP, hunger, process and connection uptime |
-| `/stats` | Lifetime casts, completed catches, item observations, pickups, meals, errors, disconnects |
+| `/stats` | RAM, CPU, tracked network usage/rates, plus lifetime fishing and item statistics |
 | `/inventory` | Item names, stack counts, and internal inventory slot numbers |
 | `/startfish` | Enable fishing; cannot clear a damage lock |
 | `/stopfish` | Pause fishing and reel in an active cast; eating remains enabled |
@@ -85,6 +85,10 @@ Copy and edit `config.example.json` as `config.json`. A local configuration must
 Read the yaw and pitch from Minecraft F3 at your own fishing spot. Negative Minecraft pitch looks upward; positive pitch looks downward. Configure both angles for your farm. The bot does not move its feet.
 
 ## What the statistics mean
+
+`/stats` starts with process resource usage: resident RAM (RSS), JavaScript heap used/allocated, CPU load sampled every five seconds, and cumulative CPU time. CPU load uses one core as 100% and can exceed 100% when multiple threads are busy. RSS includes the heap; these memory values must not be added together.
+
+Network statistics measure the bot's Minecraft sockets and Telegram HTTPS sockets, including polling and notifications. They show received/sent/total bytes and five-second transfer rates. Totals survive Minecraft reconnects within the process and include closed sockets. They reset on process restart, while lifetime fishing statistics remain persistent. These are socket byte counters, not whole-device bandwidth: Microsoft authentication traffic, DNS, TCP/IP headers, TLS overhead, and retransmissions are excluded. Before the first sample, CPU load and transfer rates show `collecting samples`.
 
 - **Casts:** calls to Mineflayer's fishing operation, including interrupted or unsuccessful attempts.
 - **Completed catches:** successful Mineflayer bite/reel completions. This does not prove that an item entered inventory or a hopper.

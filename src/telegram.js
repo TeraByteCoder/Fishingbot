@@ -1,6 +1,6 @@
 export const commands = [
   ['status', 'Connection, health, hunger and uptime'],
-  ['stats', 'Lifetime fishing and item statistics'],
+  ['stats', 'RAM, CPU, network and lifetime fishing statistics'],
   ['inventory', 'Show inventory'],
   ['startfish', 'Enable fishing'],
   ['stopfish', 'Pause fishing'],

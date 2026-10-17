@@ -4,6 +4,7 @@ import { loadConfig } from './config.js';
 import { Store } from './store.js';
 import { Controller } from './controller.js';
 import { setupTelegram, commands, chunks } from './telegram.js';
+import { Resources, MeteredTelegramAgent } from './resources.js';
 
 // A second process could overwrite a damage lock. Permit one instance per state file.
 function acquireLock(path) {
@@ -21,6 +22,7 @@ function acquireLock(path) {
 let controller;
 let telegram;
 let releaseLock;
+let telegramAgent;
 let ending = false;
 function shutdown(reason, exitCode = 0) {
   if (ending) return;
@@ -28,6 +30,7 @@ function shutdown(reason, exitCode = 0) {
   console.log(`Stopping: ${reason}`);
   try { controller?.shutdown(); } catch { exitCode = 1; }
   try { telegram?.stop(reason); } catch { /* Polling may not have started. */ }
+  telegramAgent?.destroy();
   try { releaseLock?.(); } catch { exitCode = 1; }
   process.exitCode = exitCode;
   setTimeout(() => process.exit(exitCode), 2000).unref();
@@ -42,8 +45,10 @@ try {
     import('mineflayer'), import('mineflayer-auto-eat'), import('telegraf')
   ]);
   if (!mineflayer.testedVersions.includes('1.21.4')) throw new Error('Installed Mineflayer does not support 1.21.4.');
-  telegram = new Telegraf(config.telegramToken, { handlerTimeout: 30000 });
-  controller = new Controller({ config, store, createBot: mineflayer.createBot, autoEatPlugin: loader,
+  const resources = new Resources();
+  telegramAgent = new MeteredTelegramAgent(resources);
+  telegram = new Telegraf(config.telegramToken, { handlerTimeout: 30000, telegram: { agent: telegramAgent } });
+  controller = new Controller({ config, store, createBot: mineflayer.createBot, autoEatPlugin: loader, resources,
     notify: async message => {
       for (const chunk of chunks(message)) await telegram.telegram.sendMessage(config.ownerId, chunk);
     }
